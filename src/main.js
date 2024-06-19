@@ -11,7 +11,8 @@ const snake = [
 const apple = [5, 5];
 let direction = 'e';
 let echec = false;
-let speed = 1000;
+let speed = 500;
+let eat = false;
 let head;
 
 const gameover = () => {
@@ -23,6 +24,16 @@ const gameover = () => {
       if (head[0] === bodyElem[0] && head[1] === bodyElem[1]) {
         echec = true;
       }
+    }
+  }
+};
+
+const ateApple = () => {
+  if (head[0] === apple[0] && head[1] === apple[1]) {
+    eat = true;
+    if (speed >= 200) {
+      speed -= 100;
+      console.log(speed);
     }
   }
 };
@@ -60,8 +71,27 @@ const updatePositionSnake = () => {
       break;
   }
   snake.unshift(head);
-  snake.pop();
+  ateApple();
+  if (!eat) {
+    snake.pop();
+  } else {
+    generateApple();
+  }
   gameover();
+};
+
+const generateApple = () => {
+  const [x, y] = [
+    Math.trunc(Math.random() * 31),
+    Math.trunc(Math.random() * 19),
+  ];
+  [apple[0], apple[1]] = [x, y];
+
+  for (let body of snake) {
+    if (apple[0] === body[0] && apple[1] === body[1]) {
+      return generateApple();
+    }
+  }
 };
 
 window.addEventListener('keydown', (event) => {
@@ -95,6 +125,7 @@ window.addEventListener('keydown', (event) => {
 
 const move = () => {
   updatePositionSnake();
+  eat = false;
   if (!echec) {
     drawMap();
     drawApple();
