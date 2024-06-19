@@ -10,8 +10,9 @@ const snake = [
 ];
 const apple = [5, 5];
 let direction = 'e';
-let echec = false;
 let speed = 500;
+let score = 0;
+let echec = false;
 let eat = false;
 let head;
 
@@ -31,6 +32,7 @@ const gameover = () => {
 const ateApple = () => {
   if (head[0] === apple[0] && head[1] === apple[1]) {
     eat = true;
+    score ++;
     if (speed >= 200) {
       speed -= 100;
       console.log(speed);
@@ -41,6 +43,12 @@ const ateApple = () => {
 const drawMap = () => {
   context.fillStyle = 'black';
   context.fillRect(0, 0, 800, 500);
+};
+
+const drawScore = () => {
+    context.fillStyle = 'grey';
+    context.font= 'bold 80px sans-serif ';
+    context.fillText(score, 400, 250)
 };
 
 const drawSnake = () => {
@@ -54,6 +62,20 @@ const drawApple = () => {
   context.fillStyle = 'red';
   context.fillRect(apple[0] * grid, apple[1] * grid, grid, grid);
 };
+
+const generateApple = () => {
+    const [x, y] = [
+      Math.trunc(Math.random() * 31),
+      Math.trunc(Math.random() * 19),
+    ];
+    [apple[0], apple[1]] = [x, y];
+  
+    for (let body of snake) {
+      if (apple[0] === body[0] && apple[1] === body[1]) {
+        return generateApple();
+      }
+    }
+  };
 
 const updatePositionSnake = () => {
   switch (direction) {
@@ -78,20 +100,6 @@ const updatePositionSnake = () => {
     generateApple();
   }
   gameover();
-};
-
-const generateApple = () => {
-  const [x, y] = [
-    Math.trunc(Math.random() * 31),
-    Math.trunc(Math.random() * 19),
-  ];
-  [apple[0], apple[1]] = [x, y];
-
-  for (let body of snake) {
-    if (apple[0] === body[0] && apple[1] === body[1]) {
-      return generateApple();
-    }
-  }
 };
 
 window.addEventListener('keydown', (event) => {
@@ -128,13 +136,14 @@ const move = () => {
   eat = false;
   if (!echec) {
     drawMap();
+    drawScore();
     drawApple();
     drawSnake();
     setTimeout(() => {
       requestAnimationFrame(move);
     }, speed);
   } else {
-    alert('perdu');
+    alert('Perdu, score : ' + score);
   }
 };
 
